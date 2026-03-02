@@ -1,0 +1,24 @@
+<h1>Delete Product</h1>
+
+<form action="/delete-product" method="POST">
+    <div class="form-group">
+        <label for="product_ID">Select Product to Delete:</label>
+        <select id="product_ID" name="product_ID" required>
+            <option value="">-- Select a Product --</option>
+            <option value="1">Apple Juice - $3.99 (Qty: 40)</option>
+            <option value="2">Potato Chips - $5.99 (Qty: 50)</option>
+            <option value="3">Milk - $4.25 (Qty: 25)</option>
+            <option value="4">Bread - $2.99 (Qty: 40)</option>
+            <option value="5">Soda - $4.99 (Qty: 50)</option>
+        </select>
+    </div>
+    
+    <p style="color: red; font-weight: bold;">Warning: This action cannot be undone. Products in orders will also be affected.</p>
+    
+    <button type="submit" style="background-color: red; color: white;">Delete Product</button>
+</form>
+
+<div style="margin-top: 20px">
+    <a href="/products" class="btn" style="background-color: gray">Back to Products</a>
+    <a href="/" class="btn" style="background-color: gray">Back to Home</a>
+</div>

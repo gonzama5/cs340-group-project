@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{title}}</title>
+    <style>
+        body { 
+            font-family: Arial, sans-serif; 
+            margin: 20px;
+        }
+        nav { 
+            margin-bottom: 20px;
+            padding: 10px;
+            background-color: #f5f5f5;}
+        nav a { 
+            margin-right: 15px; 
+            text-decoration: none;
+            }
+        table  {
+        border-collapse: collapse; 
+        width: 100%; 
+        margin-bottom: 20px;
+        }
+        th, td {
+        border: 1px solid #ddd;
+        padding: 8px; 
+        text-align: left;
+        }
+        th {
+            background-color: #f5f5f5;
+        }
+        .btn {
+            display: inline-block;
+            padding: 8px 12px;
+            margin-top: 10px;
+            background-color: blue;
+            color: #ddd;
+            text-decoration: none;
+            border-radius: 4px;
+        }
+
+    </style>
+</head>
+<body>
+    <div class="container">
+    <nav>
+        <a href="/">Home</a>
+        <a href="/customers">Customers</a>
+        <a href="/orders">Orders</a>
+        <a href="/products">Products</a>
+        <a href="/product-types">Product Types</a>
+        <a href="/suppliers">Suppliers</a>
+        <!-- Add these two lines -->
+        <span style="margin: 0 10px;">|</span>
+        <a href="/delete-test-customer" style="color: orange; font-weight: bold;">Delete Customer #1 (Test Reset)</a>
+        <a href="/reset-database" style="color: red; font-weight: bold; margin-left: 10px;">RESET DATABASE</a>
+    </nav>
+        {{{body}}}
+    </div>
+</body>
+</html>

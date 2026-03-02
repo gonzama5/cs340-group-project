@@ -1,0 +1,47 @@
+<h1>Add New Product</h1>
+
+<form action="/add-product" method="POST">
+    <div class="form-group">
+        <label for="name">Product Name:</label>
+        <input type="text" id="name" name="name" required>
+    </div>
+
+    <div class="form-group">
+        <label for="quantity">Quantity:</label>
+        <input type="number" id="quantity" name="quantity" min="0" required>
+    </div>
+
+    <div class="form-group">
+        <label for="price">Price:</label>
+        <input type="number" id="price" name="price" step="0.01" min="0" required>
+    </div>
+
+    <div class="form-group">
+        <label for="supplier_ID">Supplier:</label>
+        <select id="supplier_ID" name="supplier_ID" required>
+            <option value="">-- Select a Supplier --</option>
+            <option value="1">Fresh Foods Inc.</option>
+            <option value="2">Great Beverage Inc.</option>
+            <option value="3">Double Dairy</option>
+            <option value="4">Infinity Snacks</option>
+        </select>
+    </div>
+
+    <div class="form-group">
+        <label for="category_ID">Product Type:</label>
+        <select id="category_ID" name="category_ID" required>
+            <option value="">-- Select a Category --</option>
+            <option value="1">Beverages</option>
+            <option value="2">Snacks</option>
+            <option value="3">Dairy</option>
+            <option value="4">Bakery</option>
+        </select>
+    </div>
+
+    <button type="submit">Add Product</button>
+</form>
+
+<div style="margin-top: 20px">
+    <a href="/products" class="btn" style="background-color: gray">Back to Products</a>
+    <a href="/" class="btn" style="background-color: gray">Back to Home</a>
+</div>

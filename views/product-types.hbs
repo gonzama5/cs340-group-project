@@ -1,0 +1,28 @@
+<h1>Product Types</h1>
+
+<table>
+    <thead>
+        <tr>
+            <th>Category ID</th>
+            <th>Name</th>
+        </tr>
+    </thead>
+    <tbody>
+        {{#each productTypes}}
+        <tr>
+            <td>{{category_ID}}</td>
+            <td>{{name}}</td>
+        </tr>
+        {{else}}
+        <tr>
+            <td colspan="2">No product types found.</td>
+        </tr>
+        {{/each}}
+    </tbody>
+</table>
+
+<div style="margin-top: 20px">
+    <a href="/add-product-type" class="btn" style="background-color: blue">Add New Product Type</a>
+    <a href="/delete-product-type" class="btn" style="background-color: red">Delete Product Type</a>
+    <a href="/" class="btn" style="background-color: gray">Back to Home</a>
+</div>

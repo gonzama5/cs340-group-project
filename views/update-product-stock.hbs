@@ -1,0 +1,37 @@
+<h1>Update Product Stock #{{product.product_ID}}</h1>
+
+<form action="/update-product-stock/{{product.product_ID}}" method="POST">
+    <div class="form-group">
+        <label for="name">Product Name:</label>
+        <input type="text" id="name" value="{{product.name}}" disabled>
+        <small>(Product name cannot be changed here)</small>
+    </div>
+
+    <div class="form-group">
+        <label for="quantity">Quantity in Stock:</label>
+        <input type="number" id="quantity" name="quantity" value="{{product.quantity}}" min="0" required>
+    </div>
+
+    <div class="form-group">
+        <label for="price">Price:</label>
+        <input type="number" id="price" value="{{product.price}}" step="0.01" disabled>
+        <small>(Price cannot be changed here)</small>
+    </div>
+
+    <div class="form-group">
+        <label for="supplier">Supplier:</label>
+        <input type="text" id="supplier" value="{{product.supplier_name}}" disabled>
+    </div>
+
+    <div class="form-group">
+        <label for="category">Category:</label>
+        <input type="text" id="category" value="{{product.category_name}}" disabled>
+    </div>
+
+    <button type="submit">Update Stock</button>
+</form>
+
+<div style="margin-top: 20px">
+    <a href="/products" class="btn" style="background-color: gray">Back to Products</a>
+    <a href="/" class="btn" style="background-color: gray">Back to Home</a>
+</div>

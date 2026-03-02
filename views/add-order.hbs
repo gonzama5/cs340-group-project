@@ -1,0 +1,24 @@
+<h1>Add New Order</h1>
+
+<form action="/add-order" method="POST">
+    <div class="form-group">
+        <label for="customer_ID">Select Customer:</label>
+        <select id="customer_ID" name="customer_ID" required>
+            <option value="">-- Select a Customer --</option>
+            <option value="1">William Hogarth</option>
+            <option value="2">John Gilbert</option>
+            <option value="3">Peter Lely</option>
+            <option value="4">Jamini Roy</option>
+            <option value="5">Frida Kahlo</option>
+        </select>
+    </div>
+    
+    <p><small>Order date will be set to current date and time (NOW())</small></p>
+    
+    <button type="submit">Create Order</button>
+</form>
+
+<div style="margin-top: 20px">
+    <a href="/orders" class="btn" style="background-color: gray">Back to Orders</a>
+    <a href="/" class="btn" style="background-color: gray">Back to Home</a>
+</div>

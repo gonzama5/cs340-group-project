@@ -1,0 +1,40 @@
+<h1>Products</h1>
+
+<table>
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Name</th>
+            <th>Quantity</th>
+            <th>Price</th>
+            <th>Supplier</th>
+            <th>Category</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        {{#each products}}
+        <tr>
+            <td>{{product_ID}}</td>
+            <td>{{name}}</td>
+            <td>{{quantity}}</td>
+            <td>${{price}}</td>
+            <td>{{supplier_name}}</td>
+            <td>{{category_name}}</td>
+            <td>
+                <a href="/update-product-stock/{{product_ID}}" class="btn" style="background-color: green; color: white;">Edit Stock</a>
+            </td>
+        </tr>
+        {{else}}
+        <tr>
+            <td colspan="7">No products found.</td>
+        </tr>
+        {{/each}}
+    </tbody>
+</table>
+
+<div style="margin-top: 20px">
+    <a href="/add-product" class="btn" style="background-color: blue">Add New Product</a>
+    <a href="/delete-product" class="btn" style="background-color: red">Delete Product</a>
+    <a href="/" class="btn" style="background-color: gray">Back to Home</a>
+</div>

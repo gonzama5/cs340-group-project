@@ -1,0 +1,36 @@
+<h1>Customers</h1>
+
+<table>
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>First Name</th>
+            <th>Last Name</th>
+            <th>Phone</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        {{#each customers}}
+        <tr>
+            <td>{{customer_ID}}</td>
+            <td>{{first_name}}</td>
+            <td>{{last_name}}</td>
+            <td>{{phone_number}}</td>
+            <td>
+                <a href="/update-customer/{{customer_ID}}" class="btn" style="background-color: green; color: white;">Edit</a>
+            </td>
+        </tr>
+        {{else}}
+        <tr>
+            <td colspan="5">No customers found.</td>
+        </tr>
+        {{/each}}
+    </tbody>
+</table>
+
+<div style="margin-top: 20px">
+    <a href="/add-customer" class="btn" style="background-color: blue">Add New Customer</a>
+    <a href="/delete-customer" class="btn" style="background-color: red">Delete Customer</a>
+    <a href="/" class="btn" style="background-color: gray">Back to Home</a>
+</div>

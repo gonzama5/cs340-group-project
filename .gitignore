@@ -1,0 +1,17 @@
+# Dependencies
+node_modules/
+package-lock.json
+
+# Environment files
+.env
+*.log
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Forever logs
+.forever/
+
+# Debug files
+npm-debug.log*

@@ -1,0 +1,41 @@
+<h1>Order #{{orderId}} Details</h1>
+
+<table>
+    <thead>
+        <tr>
+            <th>Product ID</th>
+            <th>Product Name</th>
+            <th>Quantity</th>
+            <th>Price</th>
+            <th>Total</th>
+        </tr>
+    </thead>
+    <tbody>
+        {{#each products}}
+        <tr>
+            <td>{{product_ID}}</td>
+            <td>{{product_name}}</td>
+            <td>{{quantity}}</td>
+            <td>${{price}}</td>
+            <td>${{multiply quantity price}}</td>
+        </tr>
+        {{else}}
+        <tr>
+            <td colspan="5">No products in this order.</td>
+        </tr>
+        {{/each}}
+    </tbody>
+    {{#if products.length}}
+    <tfoot>
+        <tr>
+            <td colspan="4" style="text-align: right"><strong>Order Total:</strong></td>
+            <td><strong>${{total}}</strong></td>
+        </tr>
+    </tfoot>
+    {{/if}}
+</table>
+
+<div style="margin-top: 20px">
+    <a href="/orders" class="btn" style="background-color: gray">Back to Orders</a>
+    <a href="/" class="btn" style="background-color: gray">Back to Home</a>
+</div>

@@ -1,0 +1,25 @@
+<h1>Remove Product from Order</h1>
+
+<form action="/delete-order-product" method="POST">
+    <div class="form-group">
+        <label for="order_ID">Select Order:</label>
+        <select id="order_ID" name="order_ID" required>
+            <option value="">-- Select an Order --</option>
+            {{#each orders}}
+            <option value="{{order_ID}}">Order #{{order_ID}} - {{customer_name}} ({{date}})</option>
+            {{/each}}
+        </select>
+    </div>
+
+    <div class="form-group">
+        <label for="product_ID">Select Product to Remove:</label>
+        <select id="product_ID" name="product_ID" required>
+            <option value="">-- Select a Product --</option>
+            {{#each products}}
+            <option value="{{product_ID}}">{{name}}</option>
+            {{/each}}
+        </select>
+    </div>
+
+    <button type="submit" style="background-color: red; color: white;">Remove from Order</button>
+</form>

@@ -1,0 +1,30 @@
+<h1>Suppliers</h1>
+
+<table>
+    <thead>
+        <tr>
+            <th>Supplier ID</th>
+            <th>Name</th>
+            <th>Email</th>
+        </tr>
+    </thead>
+    <tbody>
+        {{#each suppliers}}
+        <tr>
+            <td>{{supplier_ID}}</td>
+            <td>{{name}}</td>
+            <td>{{email}}</td>
+        </tr>
+        {{else}}
+        <tr>
+            <td colspan="3">No suppliers found.</td>
+        </tr>
+        {{/each}}
+    </tbody>
+</table>
+
+<div style="margin-top: 20px">
+    <a href="/add-supplier" class="btn" style="background-color: blue">Add New Supplier</a>
+    <a href="/delete-supplier" class="btn" style="background-color: red">Delete Supplier</a>
+    <a href="/" class="btn" style="background-color: gray">Back to Home</a>
+</div>

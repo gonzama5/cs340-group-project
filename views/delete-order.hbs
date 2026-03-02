@@ -1,0 +1,22 @@
+<h1>Delete Order</h1>
+
+<form action="/delete-order" method="POST">
+    <div class="form-group">
+        <label for="order_ID">Select Order to Delete:</label>
+        <select id="order_ID" name="order_ID" required>
+            <option value="">-- Select an Order --</option>
+            {{#each orders}}
+            <option value="{{order_ID}}">Order #{{order_ID}} - {{date}} (Customer: {{customer_name}})</option>
+            {{/each}}
+        </select>
+    </div>
+    
+    <p style="color: red; font-weight: bold;">Warning: This action cannot be undone. Products in this order will also be removed.</p>
+    
+    <button type="submit" style="background-color: red; color: white;">Delete Order</button>
+</form>
+
+<div style="margin-top: 20px">
+    <a href="/orders" class="btn" style="background-color: gray">Back to Orders</a>
+    <a href="/" class="btn" style="background-color: gray">Back to Home</a>
+</div>

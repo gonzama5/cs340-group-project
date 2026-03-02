@@ -1,0 +1,22 @@
+<h1>Delete Customer</h1>
+
+<form action="/delete-customer" method="POST">
+    <div class="form-group">
+        <label for="customer_ID">Select Customer to Delete:</label>
+        <select id="customer_ID" name="customer_ID" required>
+            <option value="">-- Select a Customer --</option>
+            {{#each customers}}
+            <option value="{{customer_ID}}">{{first_name}} {{last_name}} - {{phone_number}}</option>
+            {{/each}}
+        </select>
+    </div>
+    
+    <p style="color: red; font-weight: bold;">Warning: This action cannot be undone. Orders from this customer will also be deleted (ON DELETE CASCADE).</p>
+    
+    <button type="submit" style="background-color: red; color: white;">Delete Customer</button>
+</form>
+
+<div style="margin-top: 20px">
+    <a href="/customers" class="btn" style="background-color: gray">Back to Customers</a>
+    <a href="/" class="btn" style="background-color: gray">Back to Home</a>
+</div>

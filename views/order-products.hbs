@@ -1,0 +1,38 @@
+<h1>Order Products</h1>
+
+<table>
+    <thead>
+        <tr>
+            <th>Order ID</th>
+            <th>Customer</th>
+            <th>Product</th>
+            <th>Quantity</th>
+            <th>Order Date</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        {{#each orderProducts}}
+        <tr>
+            <td>{{order_ID}}</td>
+            <td>{{customer_name}}</td>
+            <td>{{product_name}}</td>
+            <td>{{quantity}}</td>
+            <td>{{order_date}}</td>
+            <td>
+                <a href="/update-order-product/{{order_ID}}/{{product_ID}}" class="btn" style="background-color: green; color: white;">Edit</a>
+            </td>
+        </tr>
+        {{else}}
+        <tr>
+            <td colspan="6">No order products found.</td>
+        </tr>
+        {{/each}}
+    </tbody>
+</table>
+
+<div style="margin-top: 20px">
+    <a href="/add-order-product" class="btn" style="background-color: blue">Add Product to Order</a>
+    <a href="/delete-order-product" class="btn" style="background-color: red">Remove Product from Order</a>
+    <a href="/" class="btn" style="background-color: gray">Back to Home</a>
+</div>

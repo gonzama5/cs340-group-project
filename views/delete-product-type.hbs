@@ -1,0 +1,23 @@
+<h1>Delete Product Type</h1>
+
+<form action="/delete-product-type" method="POST">
+    <div class="form-group">
+        <label for="category_ID">Select Product Type to Delete:</label>
+        <select id="category_ID" name="category_ID" required>
+            <option value="">-- Select a Category --</option>
+            <option value="1">Beverages</option>
+            <option value="2">Snacks</option>
+            <option value="3">Dairy</option>
+            <option value="4">Bakery</option>
+        </select>
+    </div>
+    
+    <p style="color: red; font-weight: bold;">Warning: This action cannot be undone. Products in this category will also be deleted.</p>
+    
+    <button type="submit" style="background-color: red; color: white;">Delete Product Type</button>
+</form>
+
+<div style="margin-top: 20px">
+    <a href="/product-types" class="btn" style="background-color: gray">Back to Product Types</a>
+    <a href="/" class="btn" style="background-color: gray">Back to Home</a>
+</div>

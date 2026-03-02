@@ -1,0 +1,23 @@
+<h1>Delete Supplier</h1>
+
+<form action="/delete-supplier" method="POST">
+    <div class="form-group">
+        <label for="supplier_ID">Select Supplier to Delete:</label>
+        <select id="supplier_ID" name="supplier_ID" required>
+            <option value="">-- Select a Supplier --</option>
+            <option value="1">Fresh Foods Inc. - sales@freshfoods.com</option>
+            <option value="2">Great Beverage Inc. - contact@greatbeverage.com</option>
+            <option value="3">Double Dairy - orders@doubledairy.com</option>
+            <option value="4">Infinity Snacks - info@infinitysnacks.com</option>
+        </select>
+    </div>
+    
+    <p style="color: red; font-weight: bold;">Warning: This action cannot be undone. Products from this supplier will also be deleted.</p>
+    
+    <button type="submit" style="background-color: red; color: white;">Delete Supplier</button>
+</form>
+
+<div style="margin-top: 20px">
+    <a href="/suppliers" class="btn" style="background-color: gray">Back to Suppliers</a>
+    <a href="/" class="btn" style="background-color: gray">Back to Home</a>
+</div>
