@@ -6,7 +6,7 @@
         <select id="order_ID" name="order_ID" required>
             <option value="">-- Select an Order --</option>
             {{#each orders}}
-            <option value="{{order_ID}}">Order #{{order_ID}} - {{customer_name}} ({{date}})</option>
+                <option value="{{order_ID}}">Order #{{order_ID}} - {{customer_name}} ({{date}})</option>
             {{/each}}
         </select>
     </div>
@@ -16,7 +16,7 @@
         <select id="product_ID" name="product_ID" required>
             <option value="">-- Select a Product --</option>
             {{#each products}}
-            <option value="{{product_ID}}">{{name}}</option>
+                <option value="{{product_ID}}">{{name}}</option>
             {{/each}}
         </select>
     </div>

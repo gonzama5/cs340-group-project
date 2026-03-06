@@ -5,10 +5,11 @@
         <label for="order_ID">Select Order:</label>
         <select id="order_ID" name="order_ID" required>
             <option value="">-- Select an Order --</option>
-            <option value="1">Order #1 - 2026-02-01</option>
-            <option value="2">Order #2 - 2026-02-01</option>
-            <option value="3">Order #3 - 2026-02-01</option>
-            <option value="4">Order #4 - 2026-02-01</option>
+            {{#each orders}}
+                <option value="{{order_ID}}">
+                    Order #{{order_ID}} – {{date}}
+                </option>
+            {{/each}}
         </select>
     </div>
 
@@ -16,11 +17,11 @@
         <label for="product_ID">Select Product:</label>
         <select id="product_ID" name="product_ID" required>
             <option value="">-- Select a Product --</option>
-            <option value="1">Apple Juice - $3.99</option>
-            <option value="2">Potato Chips - $5.99</option>
-            <option value="3">Milk - $4.25</option>
-            <option value="4">Bread - $2.99</option>
-            <option value="5">Soda - $4.99</option>
+            {{#each products}}
+                <option value="{{product_ID}}">
+                    {{name}} – ${{price}}
+                </option>
+            {{/each}}
         </select>
     </div>
 

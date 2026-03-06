@@ -5,11 +5,11 @@
         <label for="customer_ID">Select Customer:</label>
         <select id="customer_ID" name="customer_ID" required>
             <option value="">-- Select a Customer --</option>
-            <option value="1">William Hogarth</option>
-            <option value="2">John Gilbert</option>
-            <option value="3">Peter Lely</option>
-            <option value="4">Jamini Roy</option>
-            <option value="5">Frida Kahlo</option>
+            {{#each customers}}
+                <option value="{{customer_ID}}">
+                    {{first_name}} {{last_name}}
+                </option>
+            {{/each}}
         </select>
     </div>
     

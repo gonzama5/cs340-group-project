@@ -5,11 +5,11 @@
         <label for="product_ID">Select Product to Delete:</label>
         <select id="product_ID" name="product_ID" required>
             <option value="">-- Select a Product --</option>
-            <option value="1">Apple Juice - $3.99 (Qty: 40)</option>
-            <option value="2">Potato Chips - $5.99 (Qty: 50)</option>
-            <option value="3">Milk - $4.25 (Qty: 25)</option>
-            <option value="4">Bread - $2.99 (Qty: 40)</option>
-            <option value="5">Soda - $4.99 (Qty: 50)</option>
+            {{#each products}}
+                <option value="{{product_ID}}">
+                    {{name}} – ${{price}} (Qty: {{quantity}})
+                </option>
+            {{/each}}
         </select>
     </div>
     

@@ -5,10 +5,11 @@
         <label for="supplier_ID">Select Supplier to Delete:</label>
         <select id="supplier_ID" name="supplier_ID" required>
             <option value="">-- Select a Supplier --</option>
-            <option value="1">Fresh Foods Inc. - sales@freshfoods.com</option>
-            <option value="2">Great Beverage Inc. - contact@greatbeverage.com</option>
-            <option value="3">Double Dairy - orders@doubledairy.com</option>
-            <option value="4">Infinity Snacks - info@infinitysnacks.com</option>
+            {{#each suppliers}}
+                <option value="{{supplier_ID}}">
+                    {{name}} - {{email}}
+                </option>
+            {{/each}}
         </select>
     </div>
     
