@@ -5,9 +5,11 @@
         <label for="category_ID">Select Product Type to Delete:</label>
         <select id="category_ID" name="category_ID" required>
             <option value="">-- Select a Category --</option>
-            <option value="{{category_ID}}">
-                {{name}}
-            </option>
+            {{#each categories}}
+                <option value="{{category_ID}}">
+                    {{name}}
+                </option>
+            {{/each}}
         </select>
     </div>
     
