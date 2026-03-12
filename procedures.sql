@@ -1,3 +1,5 @@
+-- Written by hand by Thai, aside from Reset procedure written by Mario
+
 ---------------------------- Inserts ----------------------------
 
 DROP PROCEDURE IF EXISTS p_add_customer;

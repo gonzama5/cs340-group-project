@@ -1,3 +1,5 @@
+-- Written by hand by Thai
+
 DROP FUNCTION IF EXISTS f_product_total;
 DROP FUNCTION IF EXISTS f_order_total;
 DROP FUNCTION IF EXISTS f_order_item_count;

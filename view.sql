@@ -1,3 +1,5 @@
+-- Written by hand by Thai
+
 -- View for all orders and their prices with who ordered them
 DROP VIEW IF EXISTS v_all_orders; 
 

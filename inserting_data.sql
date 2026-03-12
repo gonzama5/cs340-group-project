@@ -1,3 +1,5 @@
+-- Written by Mario
+
 -- Populating Table Customers (no dependencies)
 INSERT INTO Customers (first_name, last_name, phone_number)VALUES
 ('William','Hogarth','555-123-1111'),
