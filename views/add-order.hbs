@@ -7,7 +7,7 @@
             <option value="">-- Select a Customer --</option>
             {{#each customers}}
                 <option value="{{customer_ID}}">
-                    {{first_name}} {{last_name}}
+                    {{customer_ID}} - {{first_name}} {{last_name}}
                 </option>
             {{/each}}
         </select>

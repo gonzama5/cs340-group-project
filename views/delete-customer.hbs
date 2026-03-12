@@ -6,7 +6,9 @@
         <select id="customer_ID" name="customer_ID" required>
             <option value="">-- Select a Customer --</option>
             {{#each customers}}
-                <option value="{{customer_ID}}">{{first_name}} {{last_name}} - {{phone_number}}</option>
+                <option value="{{customer_ID}}">
+                    {{customer_ID}} - {{first_name}} {{last_name}} - {{phone_number}}
+                </option>
             {{/each}}
         </select>
     </div>
