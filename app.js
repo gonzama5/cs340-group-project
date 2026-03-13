@@ -422,64 +422,12 @@ app.post('/add-supplier', async function(req, res) {
 app.post('/add-order-product', async function(req, res) {
     try {
         const { order_ID, product_ID, quantity } = req.body;
-        
-        // Convert to numbers to ensure proper comparison
-        const quantityNum = parseInt(quantity);
-        const orderIdNum = parseInt(order_ID);
-        const productIdNum = parseInt(product_ID);
-        
-        // Check if enough stock
-        const [product] = await db.query('SELECT quantity FROM Products WHERE product_ID = ?', [productIdNum]);
-        
-        if (product[0].quantity < quantityNum) {
-            return res.status(400).send("Not enough stock available");
-        }
-        
-        // Check if product already exists in this order
-        const [existing] = await db.query(
-            'SELECT * FROM Order_has_Products WHERE order_ID = ? AND product_ID = ?',
-            [orderIdNum, productIdNum]
-        );
-        
-        // Start transaction
-        await db.query('START TRANSACTION');
-        
-        if (existing.length > 0) {
-            // PRODUCT ALREADY EXISTS - Update quantity instead
-            await db.query(
-                'UPDATE Order_has_Products SET quantity = quantity + ? WHERE order_ID = ? AND product_ID = ?',
-                [quantityNum, orderIdNum, productIdNum]
-            );
-            console.log(`Updated quantity for product ${productIdNum} in order ${orderIdNum}`);
-        } else {
-            // New product - Insert record
-            await db.query(
-                'INSERT INTO Order_has_Products (order_ID, product_ID, quantity) VALUES (?, ?, ?)',
-                [orderIdNum, productIdNum, quantityNum]
-            );
-            console.log(`Inserted new product ${productIdNum} into order ${orderIdNum}`);
-        }
-        
-        // Update stock (same for both cases)
-        await db.query(
-            'UPDATE Products SET quantity = quantity - ? WHERE product_ID = ?',
-            [quantityNum, productIdNum]
-        );
-        
-        // Commit transaction
-        await db.query('COMMIT');
-        
-        // Add a success message to the redirect
-        if (existing.length > 0) {
-            res.redirect('/order-products?message=Quantity updated successfully');
-        } else {
-            res.redirect('/order-products?message=Product added successfully');
-        }
-        
+        await db.query('CALL p_add_product_to_order(?, ?, ?)', 
+                      [order_ID, product_ID, quantity]);
+        res.redirect('/order-products?message=Product added/updated successfully');
     } catch (error) {
-        await db.query('ROLLBACK');
-        console.error("Error adding product to order:", error);
-        res.status(500).send("Error adding product to order: " + error.message);
+        console.error("Error:", error);
+        res.status(500).send("Error: " + error.message);
     }
 });
 

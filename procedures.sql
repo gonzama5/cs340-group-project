@@ -43,6 +43,7 @@ CREATE PROCEDURE p_add_product_to_order(
 )
 BEGIN
     DECLARE stock INT;
+    DECLARE existing INT;
 
     START TRANSACTION;
 
@@ -53,10 +54,24 @@ BEGIN
         ROLLBACK;
         SELECT 'Not enough stock' AS `Error`;
     ELSE
-        INSERT INTO Order_has_Products (order_ID, product_ID, quantity)
-        VALUES (p_order_ID, p_product_ID, p_quantity);
+        SELECT COUNT(*) INTO existing
+        FROM Order_has_Products
+        WHERE order_ID = p_order_ID AND product_ID = p_product_ID;
+
+        IF existing > 0 THEN
+            UPDATE Order_has_Products
+            SET quantity = quantity + p_quantity
+            WHERE order_ID = p_order_ID AND product_ID = p_product_ID;
+        ELSE
+            INSERT INTO Order_has_Products (order_ID, product_ID, quantity)
+            VALUES (p_order_ID, p_product_ID, p_quantity);
+        END IF;
+
+        UPDATE Products SET quantity = quantity - p_quantity
+        WHERE product_ID = p_product_ID;
 
         COMMIT;
+        SELECT 'Product added/updated successfully' AS 'Result';
     END IF;
 END //
 
