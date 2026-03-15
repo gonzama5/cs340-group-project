@@ -1,6 +1,7 @@
 -- -----------------------------------------------
 -- Group: Group 31 (Mario Godinez Gonzalez, Thai-Binh Guerreiro)
 -- Assignment: Project Step 2
+-- Creates all tables and constraints for the database schema.
 -- Date: 2/4/26
 -- -----------------------------------------------
 
