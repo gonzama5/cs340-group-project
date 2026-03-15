@@ -1,123 +1,37 @@
-<h1>{{message}}</h1>
+<h1>Samina's Corner Store</h1>
 
-<p>Welcome to team 31 database management interface</p>
+<div style="max-width: 900px; margin: 40px auto;">
+    <!-- Project Overview Section -->
+    <div style="margin-bottom: 48px;">
+        <h2 style="font-weight: 500; margin-bottom: 16px; padding-bottom: 8px; border-bottom: 1px solid #e2e8f0;">About</h2>
+        <p style="color: #4a5568; line-height: 1.7; margin-bottom: 20px;">
+            Samina's Corner Store is a small, family-run business that processes approximately 50 daily transactions 
+            from its ~100 regular customers and maintains inventory for roughly 20 unique products.
+        </p>
+        <p style="color: #4a5568; line-height: 1.7;">
+            Currently, sales and inventory are tracked using an outdated, error-prone paper log, resulting in frequent 
+            stockouts of popular items and an estimated 10% loss in sales annually due to poor data management. 
+            This database-driven website solves these issues by integrating customer, product, supplier, and order data 
+            into a single system, enabling accurate inventory tracking, customer purchase history, and automated sales reporting.
+        </p>
+    </div>
 
-<h2>Browse Data</h2>
-<div class="nav-menu">
-    <div class="nav-card">
-        <h3>Customers</h3>
-        <a href="/customers">Browse all Customers</a>
+    <div style="margin-bottom: 48px;">
+        <h2 style="font-weight: 500; margin-bottom: 16px; padding-bottom: 8px; border-bottom: 1px solid #e2e8f0;">Getting Started</h2>
+        <p style="color: #4a5568;">
+            Use the navigation menu above to manage:
+        </p>
+        <ul style="color: #4a5568; margin-top: 12px; padding-left: 20px;">
+            <li style="margin-bottom: 6px;"><strong>Browse</strong> - View all customers, orders, products, and inventory</li>
+            <li style="margin-bottom: 6px;"><strong>Add</strong> - Create new records in any table</li>
+            <li style="margin-bottom: 6px;"><strong>Delete</strong> - Remove existing records</li>
+            <li style="margin-bottom: 6px;"><strong>Tools</strong> - Test delete functionality and reset database</li>
+        </ul>
     </div>
-    <div class="nav-card">
-        <h3>Orders</h3>
-        <a href="/orders">Browse all Orders</a>
-    </div>
-    <div class="nav-card">
-        <h3>Products</h3>
-        <a href="/products">Browse all Products</a>
-    </div>
-    <div class="nav-card">
-        <h3>Product Types</h3>
-        <a href="/product-types">Browse all Product Types</a>
-    </div>
-    <div class="nav-card">
-        <h3>Suppliers</h3>
-        <a href="/suppliers">Browse all Suppliers</a>
-    </div>
-    <div class="nav-card">
-    <h3>Order Products</h3>
-    <a href="/order-products">Browse all Order Products</a>
+
+    <div style="margin-top: 60px; padding: 24px 0; border-top: 1px solid #e2e8f0; text-align: center;">
+        <p style="color: #718096; font-size: 0.9rem;">
+            <span style="font-weight: 600;">Team 31</span> · Mario Godinez Gonzalez & Thai-Binh Guerreiro · CS340 Portfolio Project
+        </p>
     </div>
 </div>
-
-<h2>Add New Data</h2>
-<div class="nav-menu">
-    <div class="nav-card">
-        <h3>Customers</h3>
-        <a href="/add-customer">Add Customer</a>
-    </div>
-    <div class="nav-card">
-        <h3>Orders</h3>
-        <a href="/add-order">Add Order</a>
-    </div>
-    <div class="nav-card">
-        <h3>Products</h3>
-        <a href="/add-product">Add Product</a>
-    </div>
-    <div class="nav-card">
-        <h3>Product Types</h3>
-        <a href="/add-product-type">Add Product Type</a>
-    </div>
-        <div class="nav-card">
-        <h3>Suppliers</h3>
-        <a href="/add-supplier">Add Supplier</a>
-    </div>
-    <div class="nav-card">
-    <h3>Order Products</h3>
-    <a href="/add-order-product">Add Product to Order</a>
-    </div>
-</div>
-
-<h2>Delete Data</h2>
-<div class="nav-menu">
-    <div class="nav-card">
-        <h3>Customers</h3>
-        <a href="/delete-customer">Delete Customer</a>
-    </div>
-    <div class="nav-card">
-        <h3>Orders</h3>
-        <a href="/delete-order">Delete Order</a>
-    </div>
-    <div class="nav-card">
-        <h3>Products</h3>
-        <a href="/delete-product">Delete Product</a>
-    </div>
-        <div class="nav-card">
-        <h3>Product Types</h3>
-        <a href="/delete-product-type">Delete Product Type</a>
-    </div>
-        <div class="nav-card">
-        <h3>Suppliers</h3>
-        <a href="/delete-supplier">Delete Supplier</a>
-    </div>
-    <div class="nav-card">
-    <h3>Order Products</h3>
-    <a href="/delete-order-product">Remove Product from Order</a>
-    </div>
-</div>
-
-
-
-<style>
-.nav-menu {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-    gap: 20px;
-    margin: 20px 0;
-}
-.nav-card {
-    border: 1px solid #ddd;
-    padding: 15px;
-    border-radius: 5px;
-    background-color: #f9f9f9;
-}
-.nav-card h3 {
-    margin-top: 0;
-    color: #333;
-    border-bottom: 1px solid #eee;
-    padding-bottom: 10px;
-}
-.nav-card a {
-    display: block;
-    margin: 8px 0;
-    color: #0066cc;
-    text-decoration: none;
-}
-.nav-card a:hover {
-    text-decoration: underline;
-}
-h2 {
-    margin-top: 30px;
-    color: #444;
-}
-</style>

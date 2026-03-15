@@ -1,4 +1,4 @@
--- Written by hand by Thai, aside from Reset procedure written by Mario
+-- Written by hand by Thai, aside from Reset, p_update_order_product, p_delete_product, p_delete_type, p_delete_supplier, p_delete_order_product procedure written by Mario
 
 ---------------------------- Inserts ----------------------------
 
@@ -166,6 +166,50 @@ END //
 
 DELIMITER ;
 
+-- Update order product quantity with stock adjustment
+DROP PROCEDURE IF EXISTS p_update_order_product;
+DELIMITER //
+CREATE PROCEDURE p_update_order_product(
+    IN p_order_ID INT,
+    IN p_product_ID INT,
+    IN p_new_quantity INT
+)
+BEGIN
+    DECLARE current_qty INT;
+    DECLARE diff INT;
+
+    START TRANSACTION;
+
+    SELECT quantity INTO current_qty
+    FROM Order_has_Products
+    WHERE order_ID = p_order_ID AND product_ID = p_product_ID;
+
+    IF current_qty IS NULL THEN
+        ROLLBACK;
+        SELECT 'Order product not found' AS 'Error';
+    ELSE
+
+        SET diff = p_new_quantity - current_qty;
+
+        UPDATE Order_has_Products
+        SET quantity = p_new_quantity
+        WHERE order_ID = p_order_ID AND product_ID = p_product_ID;
+
+        IF diff > 0 THEN
+            UPDATE Products 
+            SET quantity = quantity - diff
+            WHERE product_ID = p_product_ID;
+        ELSEIF diff < 0 THEN
+            UPDATE Products 
+            SET quantity = quantity + ABS(diff)
+            WHERE product_ID = p_product_ID;
+        END IF;
+
+        COMMIT;
+        SELECT 'Order product updated successfully' AS 'Result';
+    END IF;
+END //
+DELIMITER ;
 ---------------------------- Deletes ----------------------------
 
 DROP PROCEDURE IF EXISTS p_delete_customer;
@@ -221,6 +265,110 @@ END //
 
 DELIMITER ;
 
+-- Delete a product
+DROP PROCEDURE IF EXISTS p_delete_product;
+DELIMITER //
+CREATE PROCEDURE p_delete_product(
+    IN p_product_ID INT
+)
+BEGIN
+    DECLARE EXIT HANDLER FOR SQLEXCEPTION
+    BEGIN
+        ROLLBACK;
+        SELECT 'Error! Product not deleted.' AS 'Result';
+    END;
+
+    START TRANSACTION;
+    DELETE FROM Products WHERE product_ID = p_product_ID;
+
+    IF ROW_COUNT() = 0 THEN
+        ROLLBACK;
+        SELECT 'Product does not exist' AS 'Result';
+    ELSE
+        COMMIT;
+        SELECT 'Product Deleted' AS 'Result';
+    END IF;
+END //
+DELIMITER ;
+
+-- Delete a product tyepe
+DROP PROCEDURE IF EXISTS p_delete_type;
+DELIMITER //
+CREATE PROCEDURE p_delete_type(
+    IN p_category_ID INT
+)
+BEGIN
+    DECLARE EXIT HANDLER FOR SQLEXCEPTION
+    BEGIN
+        ROLLBACK;
+        SELECT 'Error! Type not deleted.' AS 'Result';
+    END;
+    
+    START TRANSACTION;
+    DELETE FROM Product_Types WHERE category_ID = p_category_ID;
+
+    IF ROW_COUNT() = 0 THEN
+        ROLLBACK;
+        SELECT 'Type does not exist' AS 'Result';
+    ELSE
+        COMMIT;
+        SELECT 'Type Deleted' AS 'Result';
+    END IF;
+END //
+DELIMITER ;
+
+-- Delete a supplier
+DROP PROCEDURE IF EXISTS p_delete_supplier;
+DELIMITER //
+CREATE PROCEDURE p_delete_supplier(
+    IN p_supplier_ID INT
+)
+BEGIN
+    DECLARE EXIT HANDLER FOR SQLEXCEPTION
+    BEGIN
+        ROLLBACK;
+        SELECT 'Error! Supplier not deleted.' AS 'Result';
+    END;
+    
+    START TRANSACTION;
+    DELETE FROM Suppliers WHERE supplier_ID = p_supplier_ID;
+
+    IF ROW_COUNT() = 0 THEN
+        ROLLBACK;
+        SELECT 'Supplier does not exist' AS 'Result';
+    ELSE
+        COMMIT;
+        SELECT 'Supplier Deleted' AS 'Result';
+    END IF;
+END //
+DELIMITER ;
+
+-- Delete an order product
+DROP PROCEDURE IF EXISTS p_delete_order_product;
+DELIMITER //
+CREATE PROCEDURE p_delete_order_product(
+    IN p_order_ID INT,
+    IN p_product_ID INT
+)
+BEGIN
+    DECLARE EXIT HANDLER FOR SQLEXCEPTION
+    BEGIN
+        ROLLBACK;
+        SELECT 'Error! Product not removed from order.' AS 'Result';
+    END;
+    
+    START TRANSACTION;
+    DELETE FROM Order_has_Products WHERE order_ID = p_order_ID AND product_ID = p_product_ID;
+
+    IF ROW_COUNT() = 0 THEN
+        ROLLBACK;
+        SELECT 'Product not found in order' AS 'Result';
+    ELSE
+        COMMIT;
+        SELECT 'Product removed from order' AS 'Result';
+    END IF;
+END //
+DELIMITER ;
 ---------------------------- Reset Database ----------------------------
 
 DROP PROCEDURE IF EXISTS ResetDatabase;
@@ -229,7 +377,6 @@ DELIMITER //
 
 CREATE PROCEDURE ResetDatabase()
 BEGIN
-    -- disable foreign key checks, allowing us to drop tables in any order
     SET FOREIGN_KEY_CHECKS = 0;
 
     DROP TABLE IF EXISTS Order_has_Products;
@@ -239,6 +386,8 @@ BEGIN
     DROP TABLE IF EXISTS Product_Types;
     DROP TABLE IF EXISTS Customers;
 
+    SET FOREIGN_KEY_CHECKS = 1;
+    
     -- Create Customers table
     CREATE TABLE Customers (
         customer_ID INT NOT NULL AUTO_INCREMENT,
@@ -294,8 +443,6 @@ BEGIN
         FOREIGN KEY (order_ID) REFERENCES Orders (order_ID) ON DELETE CASCADE,
         FOREIGN KEY (product_ID) REFERENCES Products (product_ID) ON DELETE CASCADE
     ) ENGINE = InnoDB;
-
-    SET FOREIGN_KEY_CHECKS = 1;
     
     -- Insert sample data
     INSERT INTO Customers (first_name, last_name, phone_number) VALUES
@@ -338,11 +485,10 @@ BEGIN
     (3, 5, 3),
     (4, 2, 2);
 
-    SELECT 'Database has been successfully reset!' AS 'Result';
+    SELECT 'Database tables reset successfully!' AS 'Result';
 END //
 
 DELIMITER ;
-
 ---------------------------- Triggers ----------------------------
 
 DROP TRIGGER IF EXISTS t_update_stock_after_insert;

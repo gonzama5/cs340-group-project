@@ -24,7 +24,7 @@ const express = require('express');
 const app = express();
 const PORT = 3040;
 
-// Handlebars setup - DO THIS ONCE
+// Handlebars setup
 const exphbs = require('express-handlebars');
 const hbs = exphbs.create({
     extname: '.hbs',
@@ -47,91 +47,24 @@ app.use(express.json());
 
 // Database 
 const db = require('./db-connector');
+const fs = require('fs');
 
 // Database auto-initialization on server start
 (async () => {
     try {
         console.log("Checking database state...");
         
-        // Check if tables exist AND if they have the correct IDs
         const [tables] = await db.query("SHOW TABLES LIKE 'Customers'");
-        let needsRefresh = false;
         
-        if (tables.length > 0) {
-            // Check the first customer ID - if it's not 1, we need to refresh
-            const [firstCustomer] = await db.query('SELECT customer_ID FROM Customers ORDER BY customer_ID LIMIT 1');
-            if (firstCustomer.length > 0 && firstCustomer[0].customer_ID !== 1) {
-                console.log(`Detected incorrect IDs (starts at ${firstCustomer[0].customer_ID}). Forcing database refresh...`);
-                needsRefresh = true;
-            }
-        }
-        
-        if (tables.length === 0 || needsRefresh) {
-            console.log("Setting up fresh database...");
-            const fs = require('fs');
-            
-            // disable foreign key checks to allow dropping tables in any order
-            // this fixed error such as 'foreing key constain fails'
-            console.log("Disabling foreign key checks...");
-            await db.query('SET FOREIGN_KEY_CHECKS = 0');
-            
-            // Drop all tables if they exist (clean slate)
-            console.log("Dropping existing tables...");
-            await db.query('DROP TABLE IF EXISTS Order_has_Products');
-            await db.query('DROP TABLE IF EXISTS Orders');
-            await db.query('DROP TABLE IF EXISTS Products');
-            await db.query('DROP TABLE IF EXISTS Suppliers');
-            await db.query('DROP TABLE IF EXISTS Product_Types');
-            await db.query('DROP TABLE IF EXISTS Customers');
-            
-            // Re-enable foreign key checks
-            console.log("Re-enabling foreign key checks...");
-            await db.query('SET FOREIGN_KEY_CHECKS = 1');
-            
-            // Now run DDL.sql to create tables fresh
-            console.log("Creating tables from DDL.sql...");
-            const ddl = fs.readFileSync('./DDL.sql', 'utf8');
-            const ddlQueries = ddl.split(';').filter(q => q.trim());
-            
-            for (let query of ddlQueries) {
-                if (query.trim()) {
-                    try {
-                        await db.query(query);
-                        console.log('Executed DDL query');
-                    } catch (err) {
-                        console.error('Error executing DDL query:', err.message);
-                    }
-                }
-            }
-            
-            // Now insert data - IDs will start at 1 because tables are fresh
-            console.log("Loading sample data from inserting_data.sql...");
-            const data = fs.readFileSync('./inserting_data.sql', 'utf8');
-            const dataQueries = data.split(';').filter(q => q.trim());
-            
-            for (let query of dataQueries) {
-                if (query.trim()) {
-                    try {
-                        await db.query(query);
-                        console.log('Executed INSERT query');
-                    } catch (err) {
-                        console.error('Error executing INSERT query:', err.message);
-                    }
-                }
-            }
-            
-            console.log("Database initialized successfully!");
-            
-            // Verify data was loaded
-            const [customerCount] = await db.query('SELECT COUNT(*) as count FROM Customers');
-            const [firstCustomer] = await db.query('SELECT customer_ID FROM Customers ORDER BY customer_ID LIMIT 1');
-            console.log(`Verified: ${customerCount[0].count} customers in database, starting at ID ${firstCustomer[0].customer_ID}`);
-            
+        if (tables.length === 0) {
+            console.log("Resetting database via stored procedure...");
+            await db.query('CALL ResetDatabase()');
+            console.log("Database initialized!");
         } else {
-            console.log("Database ready with correct IDs");
+            console.log("Database ready");
         }
     } catch (error) {
-        console.error("Error during database initialization:", error);
+        console.error("Error:", error);
     }
 })();
 
@@ -152,10 +85,19 @@ app.get('/', async function (req, res) {
 // Browse Customers
 app.get('/customers', async function (req, res) {
     try {
-        const [rows] = await db.query('SELECT * FROM Customers ORDER BY customer_ID');
+        const [rows] = await db.query('SELECT * FROM v_all_customers');
+        const customers = rows.map(row => {
+            const nameParts = row['Full Name'].split(', ');
+            return {
+                customer_ID: row['Customer ID'],
+                first_name: nameParts[1] || '',
+                last_name: nameParts[0] || '',
+                phone_number: row['Phone Number']
+            };
+        });
         res.render('customers', {
             title: 'Browse Customers',
-            customers: rows
+            customers: customers
         });
     } catch (error) {
         console.error("Error fetching customers:", error);
@@ -166,15 +108,16 @@ app.get('/customers', async function (req, res) {
 // Browse Orders
 app.get('/orders', async function (req, res) {
     try {
-        const [rows] = await db.query(`
-            SELECT o.*, CONCAT(c.first_name, ' ', c.last_name) AS customer_name
-            FROM Orders o
-            JOIN Customers c ON o.customer_ID = c.customer_ID
-            ORDER BY o.order_ID
-        `);
+        const [rows] = await db.query('SELECT * FROM v_all_orders');
+        const orders = rows.map(row => ({
+            order_ID: row['Order ID'],
+            customer_name: row['Customer Name'],
+            date: row['Date'],
+            total_price: row['Total Price']
+        }));
         res.render('orders', {
             title: 'Browse Orders',
-            orders: rows
+            orders: orders
         });
     } catch (error) {
         console.error("Error fetching orders:", error);
@@ -185,16 +128,18 @@ app.get('/orders', async function (req, res) {
 // Browse Products
 app.get('/products', async function (req, res) {
     try {
-        const [rows] = await db.query(`
-            SELECT p.*, s.name AS supplier_name, pt.name AS category_name
-            FROM Products p
-            JOIN Suppliers s ON p.supplier_ID = s.supplier_ID
-            JOIN Product_Types pt ON p.category_ID = pt.category_ID
-            ORDER BY p.product_ID
-        `);
+        const [rows] = await db.query('SELECT * FROM v_all_products');
+        const products = rows.map(row => ({
+            product_ID: row['Product ID'],
+            name: row['Name'],
+            quantity: row['Quantity'],
+            price: row['Price'],
+            supplier_name: row['Supplier'],
+            category_name: row['Type']
+        }));
         res.render('products', {
             title: 'Browse Products',
-            products: rows
+            products: products
         });
     } catch (error) {
         console.error("Error fetching products:", error);
@@ -205,10 +150,14 @@ app.get('/products', async function (req, res) {
 // Browse Product Types
 app.get('/product-types', async function (req, res) {
     try {
-        const [rows] = await db.query('SELECT * FROM Product_Types ORDER BY category_ID');
+        const [rows] = await db.query('SELECT * FROM v_product_types');
+        const productTypes = rows.map(row => ({
+            category_ID: row['Category ID'],
+            name: row['Name']
+        }));
         res.render('product-types', {
             title: 'Browse Product Types',
-            productTypes: rows
+            productTypes: productTypes
         });
     } catch (error) {
         console.error("Error fetching product types:", error);
@@ -219,10 +168,15 @@ app.get('/product-types', async function (req, res) {
 // Browse Suppliers
 app.get('/suppliers', async function (req, res) {
     try {
-        const [rows] = await db.query('SELECT * FROM Suppliers ORDER BY supplier_ID');
+        const [rows] = await db.query('SELECT * FROM v_all_suppliers');
+        const suppliers = rows.map(row => ({
+            supplier_ID: row['Supplier ID'],
+            name: row['Name'],
+            email: row['Email']
+        }));
         res.render('suppliers', {
             title: 'Browse Suppliers',
-            suppliers: rows
+            suppliers: suppliers
         });
     } catch (error) {
         console.error("Error fetching suppliers:", error);
@@ -233,20 +187,27 @@ app.get('/suppliers', async function (req, res) {
 // Browse Order Products
 app.get('/order-products', async function (req, res) {
     try {
-        const [rows] = await db.query(`
-            SELECT ohp.*, 
-                   CONCAT(c.first_name, ' ', c.last_name) AS customer_name,
-                   p.name AS product_name,
-                   o.date AS order_date
-            FROM Order_has_Products ohp
-            JOIN Orders o ON ohp.order_ID = o.order_ID
-            JOIN Customers c ON o.customer_ID = c.customer_ID
-            JOIN Products p ON ohp.product_ID = p.product_ID
-            ORDER BY ohp.order_ID, ohp.product_ID
-        `);
+        const [rows] = await db.query('SELECT * FROM v_order_products');
+        const orderProducts = [];
+        for (const row of rows) {
+            const [orderInfo] = await db.query(
+                'SELECT `Customer Name`, `Date` FROM v_all_orders WHERE `Order ID` = ?',
+                [row['Order ID']]
+            );
+            
+            orderProducts.push({
+                order_ID: row['Order ID'],
+                product_ID: row['Product ID'],
+                product_name: row['Product Name'],
+                quantity: row['Quantity'],
+                customer_name: orderInfo[0]?.['Customer Name'] || 'Unknown',
+                order_date: orderInfo[0]?.['Date'] || 'Unknown'
+            });
+        }
+        
         res.render('order-products', {
             title: 'Browse Order Products',
-            orderProducts: rows,
+            orderProducts: orderProducts,
             message: req.query.message,
             error: req.query.error
         });
@@ -259,24 +220,24 @@ app.get('/order-products', async function (req, res) {
 // Order Details
 app.get('/order-details/:id', async function (req, res) {
     try {
-        const [rows] = await db.query(`
-            SELECT ohp.*, p.name as product_name, p.price 
-            FROM Order_has_Products ohp
-            JOIN Products p ON ohp.product_ID = p.product_ID
-            WHERE ohp.order_ID = ?
-        `, [req.params.id]);
-        
-        // Calculate total
-        let total = 0;
-        rows.forEach(item => {
-            total += item.quantity * item.price;
-        });
-        
+        const [products] = await db.query(
+            'SELECT * FROM v_order_products WHERE `Order ID` = ?',
+            [req.params.id]
+        );
+        const [totalResult] = await db.query(
+            'SELECT f_order_total(?) as total',
+            [req.params.id]
+        );
         res.render('order-details', {
             title: `Order #${req.params.id} Details`,
             orderId: req.params.id,
-            products: rows,
-            total: total.toFixed(2)
+            products: products.map(p => ({
+                product_ID: p['Product ID'],
+                product_name: p['Product Name'],
+                quantity: p['Quantity'],
+                price: p['Price Per Product']
+            })),
+            total: totalResult[0].total ? parseFloat(totalResult[0].total).toFixed(2) : '0.00'
         });
     } catch (error) {
         console.error("Error fetching order details:", error);
@@ -353,7 +314,7 @@ app.post('/add-customer', async function(req, res) {
     try {
         const { first_name, last_name, phone_number } = req.body;
         await db.query(
-            'INSERT INTO Customers (first_name, last_name, phone_number) VALUES (?, ?, ?)',
+            'CALL p_add_customer(?, ?, ?, @cust_id)',
             [first_name, last_name, phone_number]
         );
         res.redirect('/customers');
@@ -367,11 +328,11 @@ app.post('/add-order', async function(req, res) {
     try {
         const { customer_ID } = req.body;
         await db.query(
-            'INSERT INTO Orders (date, customer_ID) VALUES (NOW(), ?)',
+            'CALL p_add_order(?, @order_id)',
             [customer_ID]
         );
         res.redirect('/orders');
-    } catch (error) {
+     } catch (error) {
         console.error("Error adding order:", error);
         res.status(500).send("Error adding order");
     }
@@ -381,7 +342,7 @@ app.post('/add-product', async function(req, res) {
     try {
         const { name, quantity, price, supplier_ID, category_ID } = req.body;
         await db.query(
-            'INSERT INTO Products (name, quantity, price, supplier_ID, category_ID) VALUES (?, ?, ?, ?, ?)',
+            'CALL p_add_product(?, ?, ?, ?, ?, @prod_id)',
             [name, quantity, price, supplier_ID, category_ID]
         );
         res.redirect('/products');
@@ -395,7 +356,7 @@ app.post('/add-product-type', async function(req, res) {
     try {
         const { name } = req.body;
         await db.query(
-            'INSERT INTO Product_Types (name) VALUES (?)',
+            'CALL p_add_type(?, @type_id)',
             [name]
         );
         res.redirect('/product-types');
@@ -409,7 +370,7 @@ app.post('/add-supplier', async function(req, res) {
     try {
         const { name, email } = req.body;
         await db.query(
-            'INSERT INTO Suppliers (name, email) VALUES (?, ?)',
+            'CALL p_add_supplier(?, ?, @supp_id)',
             [name, email]
         );
         res.redirect('/suppliers');
@@ -422,11 +383,30 @@ app.post('/add-supplier', async function(req, res) {
 app.post('/add-order-product', async function(req, res) {
     try {
         const { order_ID, product_ID, quantity } = req.body;
-        await db.query('CALL p_add_product_to_order(?, ?, ?)', 
+        
+        console.log("=== ADDING PRODUCT TO ORDER ===");
+        console.log("Order ID:", order_ID);
+        console.log("Product ID:", product_ID);
+        console.log("Quantity:", quantity);
+        
+        // Check current stock before
+        const [beforeStock] = await db.query('SELECT quantity FROM Products WHERE product_ID = ?', [product_ID]);
+        console.log("Stock BEFORE:", beforeStock[0].quantity);
+        
+        // Call the procedure
+        const [result] = await db.query('CALL p_add_product_to_order(?, ?, ?)', 
                       [order_ID, product_ID, quantity]);
+        
+        console.log("Procedure result:", JSON.stringify(result));
+        
+        // Check stock after
+        const [afterStock] = await db.query('SELECT quantity FROM Products WHERE product_ID = ?', [product_ID]);
+        console.log("Stock AFTER:", afterStock[0].quantity);
+        
         res.redirect('/order-products?message=Product added/updated successfully');
+        
     } catch (error) {
-        console.error("Error:", error);
+        console.error("ERROR in add-order-product:", error);
         res.status(500).send("Error: " + error.message);
     }
 });
@@ -528,7 +508,7 @@ app.get('/delete-order-product', async function(req, res) {
 app.post('/delete-customer', async function(req, res) {
     try {
         const { customer_ID } = req.body;
-        await db.query('DELETE FROM Customers WHERE customer_ID = ?', [customer_ID]);
+        await db.query('CALL p_delete_customer(?)', [customer_ID]);
         res.redirect('/customers');
     } catch (error) {
         console.error("Error deleting customer:", error);
@@ -539,7 +519,7 @@ app.post('/delete-customer', async function(req, res) {
 app.post('/delete-order', async function(req, res) {
     try {
         const { order_ID } = req.body;
-        await db.query('DELETE FROM Orders WHERE order_ID = ?', [order_ID]);
+        await db.query('CALL p_delete_order(?)', [order_ID]);
         res.redirect('/orders');
     } catch (error) {
         console.error("Error deleting order:", error);
@@ -550,7 +530,7 @@ app.post('/delete-order', async function(req, res) {
 app.post('/delete-product', async function(req, res) {
     try {
         const { product_ID } = req.body;
-        await db.query('DELETE FROM Products WHERE product_ID = ?', [product_ID]);
+        await db.query('CALL p_delete_product(?)', [product_ID]);
         res.redirect('/products');
     } catch (error) {
         console.error("Error deleting product:", error);
@@ -561,7 +541,7 @@ app.post('/delete-product', async function(req, res) {
 app.post('/delete-product-type', async function(req, res) {
     try {
         const { category_ID } = req.body;
-        await db.query('DELETE FROM Product_Types WHERE category_ID = ?', [category_ID]);
+        await db.query('CALL p_delete_type(?)', [category_ID]);
         res.redirect('/product-types');
     } catch (error) {
         console.error("Error deleting product type:", error);
@@ -572,7 +552,7 @@ app.post('/delete-product-type', async function(req, res) {
 app.post('/delete-supplier', async function(req, res) {
     try {
         const { supplier_ID } = req.body;
-        await db.query('DELETE FROM Suppliers WHERE supplier_ID = ?', [supplier_ID]);
+        await db.query('CALL p_delete_supplier(?)', [supplier_ID]);
         res.redirect('/suppliers');
     } catch (error) {
         console.error("Error deleting supplier:", error);
@@ -583,10 +563,7 @@ app.post('/delete-supplier', async function(req, res) {
 app.post('/delete-order-product', async function(req, res) {
     try {
         const { order_ID, product_ID } = req.body;
-        await db.query(
-            'DELETE FROM Order_has_Products WHERE order_ID = ? AND product_ID = ?',
-            [order_ID, product_ID]
-        );
+        await db.query('CALL p_delete_order_product(?, ?)', [order_ID, product_ID]);
         res.redirect('/order-products');
     } catch (error) {
         console.error("Error removing product from order:", error);
@@ -703,8 +680,8 @@ app.post('/update-customer/:id', async function(req, res) {
     try {
         const { first_name, last_name, phone_number } = req.body;
         await db.query(
-            'UPDATE Customers SET first_name = ?, last_name = ?, phone_number = ? WHERE customer_ID = ?',
-            [first_name, last_name, phone_number, req.params.id]
+            'CALL p_update_customer(?, ?, ?, ?)',
+            [req.params.id, first_name, last_name, phone_number]
         );
         res.redirect('/customers');
     } catch (error) {
@@ -717,8 +694,8 @@ app.post('/update-supplier/:id', async function(req, res) {
     try {
         const { name, email } = req.body;
         await db.query(
-            'UPDATE Suppliers SET name = ?, email = ? WHERE supplier_ID = ?',
-            [name, email, req.params.id]
+            'CALL p_update_supplier(?, ?, ?)',
+            [req.params.id, name, email]
         );
         res.redirect('/suppliers');
     } catch (error) {
@@ -731,10 +708,10 @@ app.post('/update-product-stock/:id', async function(req, res) {
     try {
         const { quantity } = req.body;
         await db.query(
-            'UPDATE Products SET quantity = ? WHERE product_ID = ?',
-            [quantity, req.params.id]
+            'CALL p_update_product_stock(?, ?)',
+            [req.params.id, quantity]
         );
-        res.redirect('/products');
+        res.redirect('/products?message=Stock updated successfully');
     } catch (error) {
         console.error("Error updating product stock:", error);
         res.status(500).send("Error updating product stock");
@@ -745,8 +722,8 @@ app.post('/update-order-product/:orderId/:productId', async function(req, res) {
     try {
         const { quantity } = req.body;
         await db.query(
-            'UPDATE Order_has_Products SET quantity = ? WHERE order_ID = ? AND product_ID = ?',
-            [quantity, req.params.orderId, req.params.productId]
+            'CALL p_update_order_product(?, ?, ?)',
+            [req.params.orderId, req.params.productId, quantity]
         );
         res.redirect('/order-products');
     } catch (error) {
@@ -763,7 +740,6 @@ app.get ('/reset-database', async function (req, res){
         res.send(`
             <h1>Database Reset Complete!</h1>
             <p>The database has been reset to its original state with all sample data.</p>
-            <p>Result: ${JSON.stringify(result[0])}</p>
             <a href="/">Return to Home</a>
         `);
     } catch(error){
