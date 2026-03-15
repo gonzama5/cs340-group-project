@@ -415,7 +415,7 @@ app.post('/add-order-product', async function(req, res) {
 
 app.get('/delete-customer', async function(req, res) {
     try {
-        const [customers] = await db.query('SELECT customer_ID, first_name, last_name FROM Customers');
+        const [customers] = await db.query('SELECT customer_ID, first_name, last_name, phone_number FROM Customers');
         res.render('delete-customer', {
             title: 'Delete Customer',
             customers: customers
@@ -446,7 +446,7 @@ app.get('/delete-order', async function(req, res) {
 
 app.get('/delete-product', async function(req, res) {
     try {
-        const [products] = await db.query('SELECT product_ID, name FROM Products');
+        const [products] = await db.query('SELECT product_ID, name, quantity, price FROM Products');
         res.render('delete-product', {
             title: 'Delete Product',
             products: products
@@ -472,7 +472,7 @@ app.get('/delete-product-type', async function(req, res) {
 
 app.get('/delete-supplier', async function(req, res) {
     try {
-        const [suppliers] = await db.query('SELECT supplier_ID, name FROM Suppliers');
+        const [suppliers] = await db.query('SELECT supplier_ID, name, email FROM Suppliers');
         res.render('delete-supplier', {
             title: 'Delete Supplier',
             suppliers: suppliers
